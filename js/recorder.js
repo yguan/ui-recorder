@@ -95,18 +95,20 @@
         return selectorList.join(' ');
     }
 
+    function recordEvent(e) {
+        var cssSelector = getCssSelector(e.target),
+            action = e.type + ' \'' + cssSelector + '\'';
+
+        recordedActions = recordedActions + action + '\n';
+        console.log(action);
+    }
+
     function record() {
         var i = 0,
             len = events.length;
 
         for (; i < len; i = i + 1) {
-            bind(document.body, events[i], function (e) {
-                var cssSelector = getCssSelector(e.target),
-                    action = e.type + ' \'' + cssSelector + '\'';
-
-                recordedActions = recordedActions + action + '\n';
-                console.log(action);
-            });
+            bind(document.body, events[i], recordEvent);
         }
     }
 
@@ -116,8 +118,7 @@
             len = events.length;
 
         for (; i < len; i = i + 1) {
-            unbind(document.body, events[i], function () {
-            });
+            unbind(document.body, events[i], recordEvent);
         }
     }
 

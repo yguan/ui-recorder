@@ -60,8 +60,8 @@
     function getIdOrCls(el) {
         if (el.id) {
             return '#' + el.id;
-        } else if (el.classList) {
-            return el.className.split(' ').join('.');
+        } else if (el.classList && el.classList.length > 0) {
+            return '.' + el.className.split(' ').join('.');
         }
         return '';
     }

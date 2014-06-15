@@ -3,9 +3,11 @@
 
 var recordedCode = '',
     generateCode,
-    eventsToRecord;
+    eventsToRecord,
+    elementsToListen;
 
 function init(config) {
+    elementsToListen = config.elementsToListen;
     generateCode = config.generateCode;
     eventsToRecord = config.eventsToRecord;
 }
@@ -30,14 +32,19 @@ function unbind(el, eventType, handler) {
     }
 }
 
-function manageEvents(action, events, handler) {
-    var i = 0,
-        len = events.length;
+function manageEvents(elements, action, events, handler) {
+    var elementIndex = 0,
+        elementCount = elements.length,
+        eventIndex = 0,
+        eventCount = events.length;
 
-    for (; i < len; i = i + 1) {
-        action(window, events[i], handler);
+    for (; elementIndex < elementCount; elementIndex++) {
+        for (; eventIndex < eventCount; eventIndex++) {
+            action(elements[elementIndex], events[eventIndex], handler);
+        }
     }
 }
+
 function recordEvent(e) {
     var code = generateCode(e);
 
@@ -46,11 +53,11 @@ function recordEvent(e) {
 }
 
 function record() {
-    manageEvents(bind, eventsToRecord, recordEvent);
+    manageEvents(elementsToListen, bind, eventsToRecord, recordEvent);
 }
 
 function stop() {
-    manageEvents(unbind, eventsToRecord, recordEvent);
+    manageEvents(elementsToListen, unbind, eventsToRecord, recordEvent);
 }
 
 function getRecordedCode() {

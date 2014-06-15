@@ -3,8 +3,8 @@
 
 module.exports = [
     'click',
-    'focus',
-    'blur',
+//    'focus',
+//    'blur',
     'dblclick',
     'change',
     'keyup',
@@ -14,7 +14,7 @@ module.exports = [
 //    'mousemove',
 //    'mouseout',
 //    'mouseover',
-    'mouseup',
+//    'mouseup',
     'resize',
 //    'scroll',
     'select',

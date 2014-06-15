@@ -5,18 +5,20 @@
 var recorder = require('./recorder');
 var eventsToRecord = require('./events-to-record');
 var codeGenerator = require('./code-generator');
-var elementsToListen = require('./elements-to-listen').getElements();
+var getElements = require('./elements-to-listen').getElements;
 
 recorder.init({
     generateCode: codeGenerator.getCssSelectorActionCode,
     eventsToRecord: eventsToRecord,
-    elementsToListen: elementsToListen
+    getElementsToListen: getElements
 });
 recorder.record();
 window.recorder = recorder;
-},{"./code-generator":2,"./elements-to-listen":3,"./events-to-record":4,"./recorder":5}],2:[function(require,module,exports){
+},{"./code-generator":2,"./elements-to-listen":3,"./events-to-record":5,"./recorder":6}],2:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
+
+var eventCodingMap = require('./event-coding-map');
 
 function up(el, stopCondition) {
     while (el.parentNode) {
@@ -66,8 +68,36 @@ function getCssSelector(el) {
     return selectorList.join(' ');
 }
 
+function isEnterText(e) {
+    var element = e.target;
+    return (element.type === 'text' || element.type === 'textarea') && e.type === 'keyup';
+}
+
+function getCustomEventCode(e) {
+    if (isEnterText(e)) {
+        return 'enterText';
+    }
+}
+
+function getEventCode(e) {
+    var code = eventCodingMap[e.type];
+
+    if (code) {
+        return code;
+    }
+
+    // handle non-existing events
+    return eventCodingMap[getCustomEventCode(e)];
+}
+
 function getCssSelectorActionCode(e) {
-    var cssSelector = getCssSelector(e.target);
+    var cssSelector = getCssSelector(e.target),
+        code = getEventCode(e);
+
+    if (code) {
+        return code + '(\'' + cssSelector + '\')';
+    }
+
     return e.type + ' \'' + cssSelector + '\'';
 }
 
@@ -75,7 +105,7 @@ module.exports = {
     getCssSelector: getCssSelector,
     getCssSelectorActionCode: getCssSelectorActionCode
 };
-},{}],3:[function(require,module,exports){
+},{"./event-coding-map":4}],3:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -97,10 +127,18 @@ module.exports = {
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
+module.exports = {
+    click: '.waitAndClick',
+    enterText: '.typeValue' // this is a non-existing event to represent type in values to a textbox or textarea
+};
+},{}],5:[function(require,module,exports){
+/*jslint nomen: true*/
+/*global $,define,require,module */
+
 module.exports = [
     'click',
-    'focus',
-    'blur',
+//    'focus',
+//    'blur',
     'dblclick',
     'change',
     'keyup',
@@ -110,7 +148,7 @@ module.exports = [
 //    'mousemove',
 //    'mouseout',
 //    'mouseover',
-    'mouseup',
+//    'mouseup',
     'resize',
 //    'scroll',
     'select',
@@ -200,17 +238,17 @@ module.exports = [
 //    volumechange,
 //    waiting
 //];
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
 var recordedCode = '',
     generateCode,
     eventsToRecord,
-    elementsToListen;
+    getElementsToListen;
 
 function init(config) {
-    elementsToListen = config.elementsToListen;
+    getElementsToListen = config.getElementsToListen;
     generateCode = config.generateCode;
     eventsToRecord = config.eventsToRecord;
 }
@@ -262,10 +300,12 @@ function recordEvent(e) {
 }
 
 function record() {
+    var elementsToListen = getElementsToListen();
     manageEvents(elementsToListen, bind, eventsToRecord, recordEvent);
 }
 
 function stop() {
+    var elementsToListen = getElementsToListen();
     manageEvents(elementsToListen, unbind, eventsToRecord, recordEvent);
 }
 

@@ -1,6 +1,8 @@
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
+var eventCodingMap = require('./event-coding-map');
+
 function up(el, stopCondition) {
     while (el.parentNode) {
         el = el.parentNode;
@@ -49,8 +51,36 @@ function getCssSelector(el) {
     return selectorList.join(' ');
 }
 
+function isEnterText(e) {
+    var element = e.target;
+    return (element.type === 'text' || element.type === 'textarea') && e.type === 'keyup';
+}
+
+function getCustomEventCode(e) {
+    if (isEnterText(e)) {
+        return 'enterText';
+    }
+}
+
+function getEventCode(e) {
+    var code = eventCodingMap[e.type];
+
+    if (code) {
+        return code;
+    }
+
+    // handle non-existing events
+    return eventCodingMap[getCustomEventCode(e)];
+}
+
 function getCssSelectorActionCode(e) {
-    var cssSelector = getCssSelector(e.target);
+    var cssSelector = getCssSelector(e.target),
+        code = getEventCode(e);
+
+    if (code) {
+        return code + '(\'' + cssSelector + '\')';
+    }
+
     return e.type + ' \'' + cssSelector + '\'';
 }
 

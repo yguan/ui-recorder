@@ -4,10 +4,10 @@
 var recordedCode = '',
     generateCode,
     eventsToRecord,
-    elementsToListen;
+    getElementsToListen;
 
 function init(config) {
-    elementsToListen = config.elementsToListen;
+    getElementsToListen = config.getElementsToListen;
     generateCode = config.generateCode;
     eventsToRecord = config.eventsToRecord;
 }
@@ -59,10 +59,12 @@ function recordEvent(e) {
 }
 
 function record() {
+    var elementsToListen = getElementsToListen();
     manageEvents(elementsToListen, bind, eventsToRecord, recordEvent);
 }
 
 function stop() {
+    var elementsToListen = getElementsToListen();
     manageEvents(elementsToListen, unbind, eventsToRecord, recordEvent);
 }
 

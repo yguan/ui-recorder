@@ -235,16 +235,22 @@ function unbind(el, eventType, handler) {
     }
 }
 
-function manageEvents(elements, action, events, handler) {
-    var elementIndex = 0,
-        elementCount = elements.length,
-        eventIndex = 0,
+function manageSingleElementEvents(element, action, events, handler) {
+    var eventIndex = 0,
         eventCount = events.length;
 
+    for (; eventIndex < eventCount; eventIndex++) {
+        action(element, events[eventIndex], handler);
+    }
+}
+
+function manageEvents(elements, action, events, handler) {
+    var elementIndex = 0,
+        elementCount = elements.length;
+
     for (; elementIndex < elementCount; elementIndex++) {
-        for (; eventIndex < eventCount; eventIndex++) {
-            action(elements[elementIndex], events[eventIndex], handler);
-        }
+        // Have to attach events with some delay between iframes. Otherwise, iframe events are not captured
+        setTimeout(manageSingleElementEvents, 50, elements[elementIndex], action, events, handler);
     }
 }
 

@@ -12,7 +12,7 @@ var ecstatic = require('ecstatic');
 
 gulp.task('http', function(){
     http.createServer(
-        ecstatic({ root: '.' })
+        ecstatic({ root: './test' })
     ).listen(9000);
 
 //    console.log('Listening on :8080');

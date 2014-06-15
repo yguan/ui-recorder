@@ -35,7 +35,7 @@ function manageEvents(action, events, handler) {
         len = events.length;
 
     for (; i < len; i = i + 1) {
-        action(document.body, events[i], handler);
+        action(window, events[i], handler);
     }
 }
 function recordEvent(e) {

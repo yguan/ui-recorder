@@ -8,15 +8,10 @@
 
 var gulp = require('gulp');
 var http = require('http');
-var ecstatic = require('ecstatic');
+var connect = require('connect');
 
 gulp.task('http', function(){
-    http.createServer(
-        ecstatic({ root: './test' })
-    ).listen(9000);
 
-//    console.log('Listening on :8080');
-//    gulp.watch('**/*.js', function(){
-//        gulp.run('your awesome task');
-//    });
+    var app = connect().use(connect.static('./test'));
+    http.createServer(app).listen(9000);
 });

@@ -48,7 +48,7 @@ function getCssSelector(el) {
 
     selectorList[0] = getIdOrCls(parentEl);
 
-    return selectorList.join(' ');
+    return selectorList.join(' ').trim();
 }
 
 function isEnterText(e) {

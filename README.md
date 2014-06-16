@@ -6,6 +6,10 @@ This repository contains the source code of a browser event recorder, which supp
 
 The basic concept of the UI Recorder is extremely simple. It adds event listeners to the browser's window and frames so that it can capture the specific events and then generate code based on the events.
 
+## Demo
+
+Click on [this link](http://yguan.github.io/repos/ui-recorder/) to go to the test page, open the browser console, click somewhere on the test page, and you should see the recorded code shown in the console. You can run `recorder.getRecordedCode()` to get the recorded code.
+
 ## Development
 
 #### Overview of Folder Structure

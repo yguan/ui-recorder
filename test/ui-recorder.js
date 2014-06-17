@@ -5,16 +5,13 @@
 var recorder = require('./recorder');
 var eventsToRecord = require('./events-to-record');
 var codeGenerator = require('./code-generator');
-var getElements = require('./elements-to-listen').getElements;
 
 recorder.init({
     generateCode: codeGenerator.getCssSelectorActionCode,
-    eventsToRecord: eventsToRecord,
-    getElementsToListen: getElements
+    eventsToRecord: eventsToRecord
 });
-recorder.record();
 window.recorder = recorder;
-},{"./code-generator":2,"./elements-to-listen":3,"./events-to-record":5,"./recorder":6}],2:[function(require,module,exports){
+},{"./code-generator":2,"./events-to-record":4,"./recorder":5}],2:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -105,25 +102,7 @@ module.exports = {
     getCssSelector: getCssSelector,
     getCssSelectorActionCode: getCssSelectorActionCode
 };
-},{"./event-coding-map":4}],3:[function(require,module,exports){
-/*jslint nomen: true*/
-/*global $,define,require,module */
-
-// Each frame is a window
-function getAllFrames(windowElement, allFrames) {
-    allFrames.push(windowElement.frames);
-    for (var i = 0; i < windowElement.frames.length; i++) {
-        getAllFrames(windowElement.frames[i], allFrames);
-    }
-    return allFrames;
-}
-
-module.exports = {
-    getElements: function () {
-        return getAllFrames(window, []);
-    }
-};
-},{}],4:[function(require,module,exports){
+},{"./event-coding-map":3}],3:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -131,7 +110,7 @@ module.exports = {
     click: '.waitAndClick',
     enterText: '.typeValue' // this is a non-existing event to represent type in values to a textbox or textarea
 };
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -238,19 +217,35 @@ module.exports = [
 //    volumechange,
 //    waiting
 //];
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
 var recordedCode = '',
     generateCode,
     eventsToRecord,
-    getElementsToListen;
+    windowToListen;
 
 function init(config) {
-    getElementsToListen = config.getElementsToListen;
     generateCode = config.generateCode;
     eventsToRecord = config.eventsToRecord;
+}
+
+function setWindowToListen(windowElement) {
+    windowToListen = windowElement;
+}
+
+// Each frame is a window
+function getAllFrames(windowElement, allFrames) {
+    allFrames.push(windowElement.frames);
+    for (var i = 0; i < windowElement.frames.length; i++) {
+        getAllFrames(windowElement.frames[i], allFrames);
+    }
+    return allFrames;
+}
+
+function getElementsToListen(windowElement) {
+    return getAllFrames(windowElement, []);
 }
 
 function bind(el, eventType, handler) {
@@ -300,12 +295,12 @@ function recordEvent(e) {
 }
 
 function record() {
-    var elementsToListen = getElementsToListen();
+    var elementsToListen = getElementsToListen(windowToListen || window);
     manageEvents(elementsToListen, bind, eventsToRecord, recordEvent);
 }
 
 function stop() {
-    var elementsToListen = getElementsToListen();
+    var elementsToListen = getElementsToListen(windowToListen || window);
     manageEvents(elementsToListen, unbind, eventsToRecord, recordEvent);
 }
 
@@ -319,6 +314,7 @@ function clearRecordedCode() {
 
 module.exports = {
     init: init,
+    setWindowToListen: setWindowToListen,
     record: record,
     stop: stop,
     getRecordedCode: getRecordedCode,

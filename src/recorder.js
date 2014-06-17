@@ -4,12 +4,28 @@
 var recordedCode = '',
     generateCode,
     eventsToRecord,
-    getElementsToListen;
+    windowToListen;
 
 function init(config) {
-    getElementsToListen = config.getElementsToListen;
     generateCode = config.generateCode;
     eventsToRecord = config.eventsToRecord;
+}
+
+function setWindowToListen(windowElement) {
+    windowToListen = windowElement;
+}
+
+// Each frame is a window
+function getAllFrames(windowElement, allFrames) {
+    allFrames.push(windowElement.frames);
+    for (var i = 0; i < windowElement.frames.length; i++) {
+        getAllFrames(windowElement.frames[i], allFrames);
+    }
+    return allFrames;
+}
+
+function getElementsToListen(windowElement) {
+    return getAllFrames(windowElement, []);
 }
 
 function bind(el, eventType, handler) {
@@ -59,12 +75,12 @@ function recordEvent(e) {
 }
 
 function record() {
-    var elementsToListen = getElementsToListen();
+    var elementsToListen = getElementsToListen(windowToListen || window);
     manageEvents(elementsToListen, bind, eventsToRecord, recordEvent);
 }
 
 function stop() {
-    var elementsToListen = getElementsToListen();
+    var elementsToListen = getElementsToListen(windowToListen || window);
     manageEvents(elementsToListen, unbind, eventsToRecord, recordEvent);
 }
 
@@ -78,6 +94,7 @@ function clearRecordedCode() {
 
 module.exports = {
     init: init,
+    setWindowToListen: setWindowToListen,
     record: record,
     stop: stop,
     getRecordedCode: getRecordedCode,

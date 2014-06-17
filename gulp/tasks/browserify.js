@@ -16,5 +16,6 @@ gulp.task('browserify', function() {
         //Pass desired output filename to vinyl-source-stream
         .pipe(source('ui-recorder.js'))
         // Start piping stream to tasks!
-        .pipe(gulp.dest('./build/'));
+        .pipe(gulp.dest('.'))
+        .pipe(gulp.dest('./test/'));
 });

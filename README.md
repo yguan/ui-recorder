@@ -50,6 +50,7 @@ For now, you have to manually copy and paste to get the recorder running, and he
 * Open a browser and go to the site that you want to record user interactions.
 * Open the browser's console (F12).
 * Copy the code from [ui-recorder.js](https://raw.githubusercontent.com/yguan/ui-recorder/master/ui-recorder.js), paste it to the console, and run it.
+* To start the recorder, run `recorder.record()` from the console.
 * To stop the recorder, run `recorder.stop()` from the console.
 * To start the recorder again, run `recorder.record()`.
 * To get the recorded code, run `recorder.getRecordedCode()`.

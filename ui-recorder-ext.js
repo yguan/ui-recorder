@@ -4,7 +4,7 @@
 
 var recorder = require('./recorder');
 var eventsToRecord = require('./events-to-record');
-var codeGenerator = require('./code-generator-css');
+var codeGenerator = require('./code-generator-ext');
 
 recorder.init({
     generateCode: codeGenerator.generateCode,
@@ -12,75 +12,28 @@ recorder.init({
 });
 window.recorder = recorder;
 module.exports = recorder;
-},{"./code-generator-css":2,"./events-to-record":7,"./recorder":8}],2:[function(require,module,exports){
+},{"./code-generator-ext":2,"./events-to-record":5,"./recorder":7}],2:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
 var eventCodingMap = require('./event-coding-map'),
-    cssSelectorFactory = require('./css-selector-factory');
+    extComponentQueryFactory = require('./ext-component-query-factory');
 
 function generateCode(evt) {
-    var cssSelector = cssSelectorFactory.getSelector(evt.target),
+    var query = JSON.stringify(extComponentQueryFactory.getQuery(evt.target)),
         code = eventCodingMap.getEventCode(evt);
 
     if (code) {
-        return code + '(\'' + cssSelector + '\')';
+        return code + '(\'' + query + '\')';
     }
 
-    return evt.type + ' \'' + cssSelector + '\'';
+    return evt.type + ' \'' + query + '\'';
 }
 
 module.exports = {
     generateCode: generateCode
 };
-},{"./css-selector-factory":3,"./event-coding-map":6}],3:[function(require,module,exports){
-/*jslint nomen: true*/
-/*global $,define,require,module */
-
-var dom = require('./dom');
-
-function getIdOrCls(el) {
-    if (el.id) {
-        return '#' + el.id;
-    } else if (el.classList && el.classList.length > 0) {
-        return '.' + el.className.split(' ').join('.');
-    }
-    return '';
-}
-
-function getCssSelector(el) {
-    var selectorList = ['', ''],
-        selector,
-        parentEl;
-
-    selectorList[1] = getIdOrCls(el);
-
-    if (el.id) {
-        return selectorList[1];
-    }
-
-    if (selectorList[1].length === 0) {
-        selector = el.nodeName;
-
-        if (selector === 'A') {
-            selector += ':contains(' + el.textContent + ')'
-        }
-        selectorList[1] = selector;
-    }
-
-    parentEl = dom.up(el, function (element) {
-        return getIdOrCls(element).length > 0;
-    });
-
-    selectorList[0] = getIdOrCls(parentEl);
-
-    return selectorList.join(' ').trim();
-}
-
-module.exports = {
-    getSelector: getCssSelector
-};
-},{"./dom":5}],4:[function(require,module,exports){
+},{"./event-coding-map":4,"./ext-component-query-factory":6}],3:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -98,26 +51,7 @@ function getCustomEventType(evt) {
 module.exports = {
     getType: getCustomEventType
 };
-},{}],5:[function(require,module,exports){
-/*jslint nomen: true*/
-/*global $,define,require,module */
-
-function up(el, stopCondition) {
-    var target = el;
-
-    while (target.parentNode) {
-        target = target.parentNode;
-        if (stopCondition(target)) {
-            break;
-        }
-    }
-    return target;
-}
-
-module.exports = {
-    up: up
-};
-},{}],6:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -141,7 +75,7 @@ function getEventCode(evt) {
 module.exports = {
     getEventCode: getEventCode
 };
-},{"./custom-event":4}],7:[function(require,module,exports){
+},{"./custom-event":3}],5:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -248,7 +182,54 @@ module.exports = [
 //    volumechange,
 //    waiting
 //];
-},{}],8:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
+/*jslint nomen: true*/
+/*global $,define,require,module,Ext */
+
+function getComponent(el) {
+    var cmp,
+        target = el;
+
+    while (target) {
+        cmp = Ext.getCmp(target.id);
+
+        if (cmp) {
+            return cmp;
+        }
+
+        target = target.parentNode;
+    }
+
+    return null;
+}
+
+function getQuery(el) {
+    var cmp = getComponent(el),
+        query;
+
+    if (!cmp) {
+        return 'No component query available.';
+    }
+
+    // Depend on the ExtJS app, either itemId or cls may be the right one to use.
+    // Use cmp.cls with cmp.getXType() to create 'someXtype[cls=someClass]'
+    query = {
+        itemId: cmp.getItemId(),
+        cls: cmp.cls,
+        xtype: cmp.getXType(),
+        el: {
+            name: el.nodeName,
+            className: el.className
+        }
+    };
+
+    return query;
+}
+
+module.exports = {
+    getQuery: getQuery
+};
+},{}],7:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 

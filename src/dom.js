@@ -2,13 +2,15 @@
 /*global $,define,require,module */
 
 function up(el, stopCondition) {
-    while (el.parentNode) {
-        el = el.parentNode;
-        if (stopCondition(el)) {
+    var target = el;
+
+    while (target.parentNode) {
+        target = target.parentNode;
+        if (stopCondition(target)) {
             break;
         }
     }
-    return el;
+    return target;
 }
 
 module.exports = {

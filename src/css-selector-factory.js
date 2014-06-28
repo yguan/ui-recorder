@@ -32,8 +32,8 @@ function getCssSelector(el) {
         selectorList[1] = selector;
     }
 
-    parentEl = dom.up(el, function () {
-        return getIdOrCls(el).length > 0;
+    parentEl = dom.up(el, function (element) {
+        return getIdOrCls(element).length > 0;
     });
 
     selectorList[0] = getIdOrCls(parentEl);

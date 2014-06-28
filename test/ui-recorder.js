@@ -4,28 +4,52 @@
 
 var recorder = require('./recorder');
 var eventsToRecord = require('./events-to-record');
-var codeGenerator = require('./code-generator');
+var codeGenerator = require('./code-generator-css');
 
 recorder.init({
-    generateCode: codeGenerator.getCssSelectorActionCode,
+    generateCode: codeGenerator.generateCode,
     eventsToRecord: eventsToRecord
 });
 window.recorder = recorder;
-},{"./code-generator":2,"./events-to-record":4,"./recorder":5}],2:[function(require,module,exports){
+module.exports = recorder;
+},{"./code-generator-css":2,"./events-to-record":7,"./recorder":8}],2:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
-var eventCodingMap = require('./event-coding-map');
+var eventCodingMap = require('./event-coding-map'),
+    cssSelectorFactory = require('./css-selector-factory'),
+    customEventCode = require('./custom-event-code');
 
-function up(el, stopCondition) {
-    while (el.parentNode) {
-        el = el.parentNode;
-        if (stopCondition(el)) {
-            break;
-        }
+function getEventCode(evt) {
+    var code = eventCodingMap[evt.type];
+
+    if (code) {
+        return code;
     }
-    return el;
+
+    // handle non-existing events
+    return eventCodingMap[customEventCode.getType(evt)];
 }
+
+function generateCode(evt) {
+    var cssSelector = cssSelectorFactory.getSelector(evt.target),
+        code = getEventCode(evt);
+
+    if (code) {
+        return code + '(\'' + cssSelector + '\')';
+    }
+
+    return evt.type + ' \'' + cssSelector + '\'';
+}
+
+module.exports = {
+    generateCode: generateCode
+};
+},{"./css-selector-factory":3,"./custom-event-code":4,"./event-coding-map":6}],3:[function(require,module,exports){
+/*jslint nomen: true*/
+/*global $,define,require,module */
+
+var dom = require('./dom');
 
 function getIdOrCls(el) {
     if (el.id) {
@@ -56,7 +80,7 @@ function getCssSelector(el) {
         selectorList[1] = selector;
     }
 
-    parentEl = up(el, function () {
+    parentEl = dom.up(el, function () {
         return getIdOrCls(el).length > 0;
     });
 
@@ -65,44 +89,45 @@ function getCssSelector(el) {
     return selectorList.join(' ').trim();
 }
 
-function isEnterText(e) {
-    var element = e.target;
-    return (element.type === 'text' || element.type === 'textarea') && e.type === 'keyup';
+module.exports = {
+    getSelector: getCssSelector
+};
+},{"./dom":5}],4:[function(require,module,exports){
+/*jslint nomen: true*/
+/*global $,define,require,module */
+
+function isEnterText(evt) {
+    var element = evt.target;
+    return (element.type === 'text' || element.type === 'textarea') && evt.type === 'keyup';
 }
 
-function getCustomEventCode(e) {
-    if (isEnterText(e)) {
+function getCustomEventCodeType(evt) {
+    if (isEnterText(evt)) {
         return 'enterText';
     }
 }
 
-function getEventCode(e) {
-    var code = eventCodingMap[e.type];
+module.exports = {
+    getType: getCustomEventCodeType
+};
+},{}],5:[function(require,module,exports){
+/*jslint nomen: true*/
+/*global $,define,require,module */
 
-    if (code) {
-        return code;
+function up(el, stopCondition) {
+    while (el.parentNode) {
+        el = el.parentNode;
+        if (stopCondition(el)) {
+            break;
+        }
     }
-
-    // handle non-existing events
-    return eventCodingMap[getCustomEventCode(e)];
-}
-
-function getCssSelectorActionCode(e) {
-    var cssSelector = getCssSelector(e.target),
-        code = getEventCode(e);
-
-    if (code) {
-        return code + '(\'' + cssSelector + '\')';
-    }
-
-    return e.type + ' \'' + cssSelector + '\'';
+    return el;
 }
 
 module.exports = {
-    getCssSelector: getCssSelector,
-    getCssSelectorActionCode: getCssSelectorActionCode
+    up: up
 };
-},{"./event-coding-map":3}],3:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -110,7 +135,7 @@ module.exports = {
     click: '.waitAndClick',
     enterText: '.typeValue' // this is a non-existing event to represent type in values to a textbox or textarea
 };
-},{}],4:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -217,7 +242,7 @@ module.exports = [
 //    volumechange,
 //    waiting
 //];
-},{}],5:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 

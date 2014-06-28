@@ -17,23 +17,11 @@ module.exports = recorder;
 /*global $,define,require,module */
 
 var eventCodingMap = require('./event-coding-map'),
-    cssSelectorFactory = require('./css-selector-factory'),
-    customEventCode = require('./custom-event-code');
-
-function getEventCode(evt) {
-    var code = eventCodingMap[evt.type];
-
-    if (code) {
-        return code;
-    }
-
-    // handle non-existing events
-    return eventCodingMap[customEventCode.getType(evt)];
-}
+    cssSelectorFactory = require('./css-selector-factory');
 
 function generateCode(evt) {
     var cssSelector = cssSelectorFactory.getSelector(evt.target),
-        code = getEventCode(evt);
+        code = eventCodingMap.getEventCode(evt);
 
     if (code) {
         return code + '(\'' + cssSelector + '\')';
@@ -45,7 +33,7 @@ function generateCode(evt) {
 module.exports = {
     generateCode: generateCode
 };
-},{"./css-selector-factory":3,"./custom-event-code":4,"./event-coding-map":6}],3:[function(require,module,exports){
+},{"./css-selector-factory":3,"./event-coding-map":6}],3:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -101,14 +89,14 @@ function isEnterText(evt) {
     return (element.type === 'text' || element.type === 'textarea') && evt.type === 'keyup';
 }
 
-function getCustomEventCodeType(evt) {
+function getCustomEventType(evt) {
     if (isEnterText(evt)) {
         return 'enterText';
     }
 }
 
 module.exports = {
-    getType: getCustomEventCodeType
+    getType: getCustomEventType
 };
 },{}],5:[function(require,module,exports){
 /*jslint nomen: true*/
@@ -131,11 +119,27 @@ module.exports = {
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
+var customEvent = require('./custom-event'),
+    codingMap = {
+        click: '.waitAndClick',
+        enterText: '.typeValue' // this is a non-existing event to represent type in values to a textbox or textarea
+    };
+
+function getEventCode(evt) {
+    var code = codingMap[evt.type];
+
+    if (code) {
+        return code;
+    }
+
+    // handle non-existing events
+    return codingMap[customEvent.getType(evt)];
+}
+
 module.exports = {
-    click: '.waitAndClick',
-    enterText: '.typeValue' // this is a non-existing event to represent type in values to a textbox or textarea
+    getEventCode: getEventCode
 };
-},{}],7:[function(require,module,exports){
+},{"./custom-event":4}],7:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 

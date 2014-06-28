@@ -6,12 +6,12 @@ function isEnterText(evt) {
     return (element.type === 'text' || element.type === 'textarea') && evt.type === 'keyup';
 }
 
-function getCustomEventCodeType(evt) {
+function getCustomEventType(evt) {
     if (isEnterText(evt)) {
         return 'enterText';
     }
 }
 
 module.exports = {
-    getType: getCustomEventCodeType
+    getType: getCustomEventType
 };

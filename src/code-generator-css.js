@@ -2,23 +2,11 @@
 /*global $,define,require,module */
 
 var eventCodingMap = require('./event-coding-map'),
-    cssSelectorFactory = require('./css-selector-factory'),
-    customEventCode = require('./custom-event-code');
-
-function getEventCode(evt) {
-    var code = eventCodingMap[evt.type];
-
-    if (code) {
-        return code;
-    }
-
-    // handle non-existing events
-    return eventCodingMap[customEventCode.getType(evt)];
-}
+    cssSelectorFactory = require('./css-selector-factory');
 
 function generateCode(evt) {
     var cssSelector = cssSelectorFactory.getSelector(evt.target),
-        code = getEventCode(evt);
+        code = eventCodingMap.getEventCode(evt);
 
     if (code) {
         return code + '(\'' + cssSelector + '\')';

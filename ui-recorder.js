@@ -322,16 +322,21 @@ function recordEvent(e) {
     var code = generateCode(e);
 
     recordedCode = recordedCode + code + '\n';
-    console.log(code);
+    console.recorderLog(code);
 }
 
 function record() {
     var elementsToListen = getElementsToListen(windowToListen || window);
+    console.recorderLog = console.log; // hijack the console.log so that only recorded code will be shown
+    console.log = function () {};
     manageEvents(elementsToListen, bind, eventsToRecord, recordEvent);
 }
 
 function stop() {
     var elementsToListen = getElementsToListen(windowToListen || window);
+    if (console.recorderLog) {
+        console.log = console.recorderLog;
+    }
     manageEvents(elementsToListen, unbind, eventsToRecord, recordEvent);
 }
 

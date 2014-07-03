@@ -12,28 +12,30 @@ recorder.init({
 });
 window.recorder = recorder;
 module.exports = recorder;
-},{"./code-generator-css":2,"./events-to-record":7,"./recorder":8}],2:[function(require,module,exports){
+},{"./code-generator-css":2,"./events-to-record":8,"./recorder":9}],2:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
 var eventCodingMap = require('./event-coding-map'),
-    cssSelectorFactory = require('./css-selector-factory');
+    cssSelectorFactory = require('./css-selector-factory'),
+    eventCoordinators = require('./event-coordinates');
 
 function generateCode(evt) {
     var cssSelector = cssSelectorFactory.getSelector(evt.target),
-        code = eventCodingMap.getEventCode(evt);
+        code = eventCodingMap.getEventCode(evt),
+        coordinates = eventCoordinators.getClientCoordinates(evt);
 
     if (code) {
-        return code + '(\'' + cssSelector + '\')';
+        return code + '(\'' + cssSelector + '\', ' + JSON.stringify(coordinates) + ')';
     }
 
-    return evt.type + ' \'' + cssSelector + '\'';
+    return evt.type + ' \'' + cssSelector + '\' ' + JSON.stringify(coordinates);
 }
 
 module.exports = {
     generateCode: generateCode
 };
-},{"./css-selector-factory":3,"./event-coding-map":6}],3:[function(require,module,exports){
+},{"./css-selector-factory":3,"./event-coding-map":6,"./event-coordinates":7}],3:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -145,6 +147,31 @@ module.exports = {
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
+var eventsWithCoordinates = {
+    mouseup: true,
+    mousedown: true,
+    mousemove: true,
+    mouseover: true
+};
+
+function getClientCoordinates(evt) {
+    if (!eventsWithCoordinates[evt.type]) {
+        return '';
+    }
+
+    return {
+        x: evt.clientX,
+        y: evt.clientY
+    };
+}
+
+module.exports = {
+    getClientCoordinates: getClientCoordinates
+};
+},{}],8:[function(require,module,exports){
+/*jslint nomen: true*/
+/*global $,define,require,module */
+
 module.exports = [
     'click',
 //    'focus',
@@ -154,7 +181,7 @@ module.exports = [
     'keyup',
 //    'keydown',
 //    'keypress',
-//    'mousedown',
+    'mousedown',
 //    'mousemove',
 //    'mouseout',
 //    'mouseover',
@@ -248,7 +275,7 @@ module.exports = [
 //    volumechange,
 //    waiting
 //];
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 

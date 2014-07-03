@@ -88,7 +88,7 @@ module.exports = [
     'keyup',
 //    'keydown',
 //    'keypress',
-//    'mousedown',
+    'mousedown',
 //    'mousemove',
 //    'mouseout',
 //    'mouseover',

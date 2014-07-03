@@ -2,17 +2,19 @@
 /*global $,define,require,module */
 
 var eventCodingMap = require('./event-coding-map'),
-    cssSelectorFactory = require('./css-selector-factory');
+    cssSelectorFactory = require('./css-selector-factory'),
+    eventCoordinators = require('./event-coordinates');
 
 function generateCode(evt) {
     var cssSelector = cssSelectorFactory.getSelector(evt.target),
-        code = eventCodingMap.getEventCode(evt);
+        code = eventCodingMap.getEventCode(evt),
+        coordinates = eventCoordinators.getClientCoordinates(evt);
 
     if (code) {
-        return code + '(\'' + cssSelector + '\')';
+        return code + '(\'' + cssSelector + '\', ' + JSON.stringify(coordinates) + ')';
     }
 
-    return evt.type + ' \'' + cssSelector + '\'';
+    return evt.type + ' \'' + cssSelector + '\' ' + JSON.stringify(coordinates);
 }
 
 module.exports = {

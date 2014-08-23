@@ -9,5 +9,5 @@ recorder.init({
     generateCode: codeGenerator.generateCode,
     eventsToRecord: eventsToRecord
 });
-window.recorder = recorder;
+window.recorderExt = recorder;
 module.exports = recorder;

@@ -1,3 +1,3 @@
 var gulp = require('gulp');
 
-gulp.task('build', ['browserify', 'browserify-ext']);
+gulp.task('build', ['browserify', 'browserify-ext', 'browserify-ext-selector']);

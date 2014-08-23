@@ -3,11 +3,11 @@
 
 var recorder = require('./recorder');
 var eventsToRecord = require('./events-to-record');
-var codeGenerator = require('./code-generator-css');
+var codeGenerator = require('./object-generator-ext-selector');
 
 recorder.init({
-    generateCode: codeGenerator.generateCode,
+    generateObject: codeGenerator.generateObject,
     eventsToRecord: eventsToRecord
 });
-window.recorderCss = recorder;
+window.recorderES = recorder;
 module.exports = recorder;

@@ -4,78 +4,15 @@
 
 var recorder = require('./recorder');
 var eventsToRecord = require('./events-to-record');
-var codeGenerator = require('./code-generator-ext');
+var codeGenerator = require('./object-generator-ext-selector');
 
 recorder.init({
-    generateCode: codeGenerator.generateCode,
+    generateObject: codeGenerator.generateObject,
     eventsToRecord: eventsToRecord
 });
-window.recorderExt = recorder;
+window.recorderES = recorder;
 module.exports = recorder;
-},{"./code-generator-ext":2,"./events-to-record":5,"./recorder":7}],2:[function(require,module,exports){
-/*jslint nomen: true*/
-/*global $,define,require,module */
-
-var eventCodingMap = require('./event-coding-map'),
-    extComponentQueryFactory = require('./ext-component-query-factory');
-
-function generateCode(evt) {
-    var query = JSON.stringify(extComponentQueryFactory.getQuery(evt.target)),
-        code = eventCodingMap.getEventCode(evt);
-
-    if (code) {
-        return code + '(\'' + query + '\')';
-    }
-
-    return evt.type + ' \'' + query + '\'';
-}
-
-module.exports = {
-    generateCode: generateCode
-};
-},{"./event-coding-map":4,"./ext-component-query-factory":6}],3:[function(require,module,exports){
-/*jslint nomen: true*/
-/*global $,define,require,module */
-
-function isEnterText(evt) {
-    var element = evt.target;
-    return (element.type === 'text' || element.type === 'textarea') && evt.type === 'keyup';
-}
-
-function getCustomEventType(evt) {
-    if (isEnterText(evt)) {
-        return 'enterText';
-    }
-}
-
-module.exports = {
-    getType: getCustomEventType
-};
-},{}],4:[function(require,module,exports){
-/*jslint nomen: true*/
-/*global $,define,require,module */
-
-var customEvent = require('./custom-event'),
-    codingMap = {
-        click: '.waitAndClick',
-        enterText: '.typeValue' // this is a non-existing event to represent type in values to a textbox or textarea
-    };
-
-function getEventCode(evt) {
-    var code = codingMap[evt.type];
-
-    if (code) {
-        return code;
-    }
-
-    // handle non-existing events
-    return codingMap[customEvent.getType(evt)];
-}
-
-module.exports = {
-    getEventCode: getEventCode
-};
-},{"./custom-event":3}],5:[function(require,module,exports){
+},{"./events-to-record":2,"./object-generator-ext-selector":4,"./recorder":5}],2:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -182,7 +119,7 @@ module.exports = [
 //    volumechange,
 //    waiting
 //];
-},{}],6:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module,Ext */
 
@@ -229,7 +166,23 @@ function getQuery(el) {
 module.exports = {
     getQuery: getQuery
 };
-},{}],7:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
+/*jslint nomen: true*/
+/*global $,define,require,module */
+
+var extComponentQueryFactory = require('./ext-component-query-factory');
+
+function generateObject(evt) {
+    var query = extComponentQueryFactory.getQuery(evt.target);
+    query.event = evt.type;
+
+    return query;
+}
+
+module.exports = {
+    generateObject: generateObject
+};
+},{"./ext-component-query-factory":3}],5:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 

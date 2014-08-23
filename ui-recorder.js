@@ -10,7 +10,7 @@ recorder.init({
     generateCode: codeGenerator.generateCode,
     eventsToRecord: eventsToRecord
 });
-window.recorder = recorder;
+window.recorderCss = recorder;
 module.exports = recorder;
 },{"./code-generator-css":2,"./events-to-record":8,"./recorder":9}],2:[function(require,module,exports){
 /*jslint nomen: true*/
@@ -281,11 +281,13 @@ module.exports = [
 
 var recordedCode = '',
     generateCode,
+    generateObject,
     eventsToRecord,
     windowToListen;
 
 function init(config) {
     generateCode = config.generateCode;
+    generateObject = config.generateObject;
     eventsToRecord = config.eventsToRecord;
 }
 
@@ -346,10 +348,17 @@ function manageEvents(elements, action, events, handler) {
 }
 
 function recordEvent(e) {
-    var code = generateCode(e);
+    var code;
 
-    recordedCode = recordedCode + code + '\n';
-    console.recorderLog(code);
+    if (generateObject) {
+        console.recorderLog(JSON.stringify(generateObject(e), true, 2));
+    }
+    if (generateCode) {
+        code = generateCode(e);
+
+        recordedCode = recordedCode + code + '\n';
+        console.recorderLog(code);
+    }
 }
 
 function record() {

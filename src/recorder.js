@@ -3,11 +3,13 @@
 
 var recordedCode = '',
     generateCode,
+    generateObject,
     eventsToRecord,
     windowToListen;
 
 function init(config) {
     generateCode = config.generateCode;
+    generateObject = config.generateObject;
     eventsToRecord = config.eventsToRecord;
 }
 
@@ -68,10 +70,17 @@ function manageEvents(elements, action, events, handler) {
 }
 
 function recordEvent(e) {
-    var code = generateCode(e);
+    var code;
 
-    recordedCode = recordedCode + code + '\n';
-    console.recorderLog(code);
+    if (generateObject) {
+        console.recorderLog(JSON.stringify(generateObject(e), true, 2));
+    }
+    if (generateCode) {
+        code = generateCode(e);
+
+        recordedCode = recordedCode + code + '\n';
+        console.recorderLog(code);
+    }
 }
 
 function record() {

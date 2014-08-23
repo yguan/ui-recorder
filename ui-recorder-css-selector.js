@@ -4,38 +4,22 @@
 
 var recorder = require('./recorder');
 var eventsToRecord = require('./events-to-record');
-var codeGenerator = require('./code-generator-css');
-
-recorder.init({
-    generateCode: codeGenerator.generateCode,
-    eventsToRecord: eventsToRecord
-});
-window.recorder = recorder;
-module.exports = recorder;
-},{"./code-generator-css":2,"./events-to-record":8,"./recorder":9}],2:[function(require,module,exports){
-/*jslint nomen: true*/
-/*global $,define,require,module */
-
-var eventCodingMap = require('./event-coding-map'),
-    cssSelectorFactory = require('./css-selector-factory'),
-    eventCoordinators = require('./event-coordinates');
+var cssSelectorFactory = require('./css-selector-factory');
+var eventCoordinators = require('./event-coordinates');
 
 function generateCode(evt) {
     var cssSelector = cssSelectorFactory.getSelector(evt.target),
-        code = eventCodingMap.getEventCode(evt),
         coordinates = eventCoordinators.getClientCoordinates(evt);
-
-    if (code) {
-        return code + '(\'' + cssSelector + '\', ' + JSON.stringify(coordinates) + ')';
-    }
-
     return evt.type + ' \'' + cssSelector + '\' ' + JSON.stringify(coordinates);
 }
 
-module.exports = {
-    generateCode: generateCode
-};
-},{"./css-selector-factory":3,"./event-coding-map":6,"./event-coordinates":7}],3:[function(require,module,exports){
+recorder.init({
+    generateCode: generateCode,
+    eventsToRecord: eventsToRecord
+});
+window.recorderCss = recorder;
+module.exports = recorder;
+},{"./css-selector-factory":2,"./event-coordinates":4,"./events-to-record":5,"./recorder":6}],2:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -82,25 +66,7 @@ function getCssSelector(el) {
 module.exports = {
     getSelector: getCssSelector
 };
-},{"./dom":5}],4:[function(require,module,exports){
-/*jslint nomen: true*/
-/*global $,define,require,module */
-
-function isEnterText(evt) {
-    var element = evt.target;
-    return (element.type === 'text' || element.type === 'textarea') && evt.type === 'keyup';
-}
-
-function getCustomEventType(evt) {
-    if (isEnterText(evt)) {
-        return 'enterText';
-    }
-}
-
-module.exports = {
-    getType: getCustomEventType
-};
-},{}],5:[function(require,module,exports){
+},{"./dom":3}],3:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -119,31 +85,7 @@ function up(el, stopCondition) {
 module.exports = {
     up: up
 };
-},{}],6:[function(require,module,exports){
-/*jslint nomen: true*/
-/*global $,define,require,module */
-
-var customEvent = require('./custom-event'),
-    codingMap = {
-        click: '.waitAndClick',
-        enterText: '.typeValue' // this is a non-existing event to represent type in values to a textbox or textarea
-    };
-
-function getEventCode(evt) {
-    var code = codingMap[evt.type];
-
-    if (code) {
-        return code;
-    }
-
-    // handle non-existing events
-    return codingMap[customEvent.getType(evt)];
-}
-
-module.exports = {
-    getEventCode: getEventCode
-};
-},{"./custom-event":4}],7:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -168,7 +110,7 @@ function getClientCoordinates(evt) {
 module.exports = {
     getClientCoordinates: getClientCoordinates
 };
-},{}],8:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 
@@ -275,7 +217,7 @@ module.exports = [
 //    volumechange,
 //    waiting
 //];
-},{}],9:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /*jslint nomen: true*/
 /*global $,define,require,module */
 

@@ -10,7 +10,7 @@ recorder.init({
     generateCode: codeGenerator.generateCode,
     eventsToRecord: eventsToRecord
 });
-window.recorderCss = recorder;
+window.recorder = recorder;
 module.exports = recorder;
 },{"./code-generator-css":2,"./events-to-record":8,"./recorder":9}],2:[function(require,module,exports){
 /*jslint nomen: true*/
